@@ -67,7 +67,7 @@ app.post("/compose", function (req, res) {
   postInsert().then(res.redirect("/"));
 });
 
-app.get("/delete", function(req,res){
+app.get("/delete", function (req, res) {
 
   Post.find({}, function (err, result) {
     if (!err) {
@@ -76,24 +76,24 @@ app.get("/delete", function(req,res){
   })
 })
 
-app.post('/delete', (req, res)=>{
+app.post('/delete', (req, res) => {
   const deletePostId = req.body.deleteButton;
-  
-  async function postDelete(){
-    Post.deleteMany({_id: deletePostId}, (err, result) => {
-      if(!err){
-        console.log("Successfully Deleted Post "+ deletePostId);
+
+  async function postDelete() {
+    Post.deleteMany({ _id: deletePostId }, (err, result) => {
+      if (!err) {
+        console.log("Successfully Deleted Post " + deletePostId);
         console.log(result);
       }
-      else{
+      else {
         console.log(err);
       }
     })
   }
   postDelete().then(res.redirect("/delete"));
-  
+
 })
-app.get("/favicon.ico", (req, res)=>{});
+app.get("/favicon.ico", (req, res) => { });
 
 app.get("/posts/:postId", function (req, res) {
   const requestedId = req.params.postId;
@@ -108,11 +108,7 @@ app.get("/posts/:postId", function (req, res) {
   })
 });
 
-let port = process.env.PORT;
-if (port == null || port == "") {
-  port = 3000;
-}
 
-app.listen(port, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log("Server started on port 3000");
 });

@@ -93,6 +93,7 @@ app.post('/delete', (req, res)=>{
   postDelete().then(res.redirect("/delete"));
   
 })
+app.get("/favicon.ico", (req, res)=>{});
 
 app.get("/posts/:postId", function (req, res) {
   const requestedId = req.params.postId;

@@ -1,11 +1,9 @@
 'use strict';
 
-const { inspect } = require('util');
-
 module.exports = function isAsyncFunction(v) {
-  if (typeof v !== 'function') {
-    return;
-  }
-
-  return inspect(v).startsWith('[AsyncFunction:');
+  return (
+    typeof v === 'function' &&
+    v.constructor &&
+    v.constructor.name === 'AsyncFunction'
+  );
 };

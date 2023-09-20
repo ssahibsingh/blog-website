@@ -4,13 +4,13 @@
 This Blog Website is created with the help of Node.js, Database MongoDB and deployed using Heroku
 ## Demo
 
-https://blogwebsite-pvt.herokuapp.com/
+https://blog-6lel.onrender.com/
 
 
 ## Features
 
 - Compose New Post
-    > `https://blogwebsite-pvt.herokuapp.com/compose`
+    > `https://blog-6lel.onrender.com/compose`
 
 - Dynamically get a Web Page for your Post
 

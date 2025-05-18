@@ -1,116 +1,63 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const ejs = require("ejs");
-const _ = require("lodash");
-const mongoose = require("mongoose");
-require('dotenv').config()
+const express = require('express');
+const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const methodOverride = require('method-override');
+const blogRoutes = require('./src/routes/blogRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const userAuth = require('./src/middleware/userAuth');
+const User = require('./src/models/User');
+require('dotenv').config();
+const path = require('path');
 
+// Configure mongoose
+mongoose.set('strictQuery', false);
 
-mongoose.connect(process.env.MONGODB_URI);
-
-const homeContent = "This is Blog Website in which you can compose new Blog Posts by writing '/compose' after the current URL and you will see your composed post on the Home Page itself.";
-const aboutContent = "This Blog Website is created with the help of Node.js and Database MongoDB. Other Technologies used are: Expressjs, EJS and Mongoose.";
-const contactContent = ""
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((err) => {
+  console.error('MongoDB connection error:', err);
+});
 
 const app = express();
 
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(methodOverride('_method'));
+app.use(express.static('public'));
+
+// Set view engine
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("public"));
+// Global user middleware
+app.use(userAuth);
 
-const postSchema = mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  }
-})
-
-const Post = mongoose.model('Post', postSchema);
-
-app.get("/", function (req, res) {
-
-  Post.find({}, function (err, result) {
-    if (!err) {
-      res.render('home', { startingContent: homeContent, posts: result });
-    }
-  })
+// Favicon handling - must come before routes
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end(); // No content response
 });
 
-app.get("/about", function (req, res) {
-  res.render("about", { aboutContent: aboutContent });
+// Routes
+app.use('/auth', authRoutes);
+app.use('/', blogRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).render('error', { error: 'Something went wrong!' });
 });
 
-app.get("/contact", function (req, res) {
-  res.render("contact", { contactContent: contactContent });
+// 404 handler
+app.use((req, res) => {
+  res.status(404).render('error', { error: 'Page not found' });
 });
 
-app.get("/compose", function (req, res) {
-  res.render("compose");
-});
-
-app.post("/compose", function (req, res) {
-  const post = {
-    title: req.body.postTitle,
-    content: req.body.postBody
-  };
-
-  async function postInsert() {
-    Post.insertMany(post, (err, result) => {
-      if (!err) {
-        console.log("Successfully Composed New Post");
-      }
-    })
-  }
-  postInsert().then(res.redirect("/"));
-});
-
-app.get("/delete", function (req, res) {
-
-  Post.find({}, function (err, result) {
-    if (!err) {
-      res.render('delete', { posts: result });
-    }
-  })
-})
-
-app.post('/delete', (req, res) => {
-  const deletePostId = req.body.deleteButton;
-
-  async function postDelete() {
-    Post.deleteMany({ _id: deletePostId }, (err, result) => {
-      if (!err) {
-        console.log("Successfully Deleted Post " + deletePostId);
-        console.log(result);
-      }
-      else {
-        console.log(err);
-      }
-    })
-  }
-  postDelete().then(res.redirect("/delete"));
-
-})
-app.get("/favicon.ico", (req, res) => { });
-
-app.get("/posts/:postId", function (req, res) {
-  const requestedId = req.params.postId;
-
-  Post.findOne({ _id: requestedId }, (err, result) => {
-    if (!err) {
-      res.render("post", { title: result.title, content: result.content });
-    }
-    else {
-
-    }
-  })
-});
-
-
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Server started on port 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

@@ -1,6 +1,34 @@
 <%- include("partials/header"); -%>
 
-  <h1><%=title%></h1>
-  <p><%=content%></p>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title"><%= post.title %></h1>
+          <p class="text-muted">
+            By <%= post.author ? post.author.username : 'Unknown' %> on <%= new Date(post.createdAt).toLocaleDateString() %>
+          </p>
+          <div class="card-text">
+            <%= post.content %>
+          </div>
+          
+          <% if (locals.user && post.author && locals.user._id.toString() === post.author._id.toString()) { %>
+            <div class="mt-4">
+              <a href="/posts/<%= post._id %>/edit" class="btn btn-secondary">Edit</a>
+              <form action="/posts/<%= post._id %>/delete" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+              </form>
+            </div>
+          <% } %>
+          
+          <div class="mt-4">
+            <a href="/" class="btn btn-primary">Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <%- include("partials/footer"); -%>

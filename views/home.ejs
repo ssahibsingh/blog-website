@@ -1,21 +1,109 @@
+<%- include('partials/header') %>
 
-<%- include("partials/header"); -%>
-    <h1>Home</h1>
-    <p> <%= startingContent %> </p>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8">
+      <h1>Blog Posts</h1>
+      <% if (!locals.user) { %>
+        <p class="text-muted">Please <a href="/auth/login">login</a> to create new posts.</p>
+      <% } %>
 
+      <% if (posts.length === 0) { %>
+        <div class="alert alert-info">No posts found.</div>
+      <% } else { %>
+        <% posts.forEach(post => { %>
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"><%= post.title %></h2>
+              <p class="card-text text-muted">
+                By <%= post.author ? post.author.username : 'Unknown' %> on <%= new Date(post.createdAt).toLocaleDateString() %>
+              </p>
+              <p class="card-text"><%= post.content.substring(0, 200) %>...</p>
+              <a href="/posts/<%= post._id %>" class="btn btn-primary">Read More</a>
+              <% if (locals.user && post.author && locals.user._id.toString() === post.author._id.toString()) { %>
+                <a href="/posts/<%= post._id %>/edit" class="btn btn-secondary">Edit</a>
+                <form action="/posts/<%= post._id %>/delete" method="POST" class="d-inline">
+                  <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        <% }); %>
 
-  <%  posts.forEach(function(post){ %>
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <p class="text-muted">
+              Showing <%= (currentPage - 1) * 6 + 1 %> to <%= Math.min(currentPage * 6, totalPosts) %> of <%= totalPosts %> posts
+            </p>
+            <nav aria-label="Page navigation">
+              <ul class="pagination mb-0">
+                <% if (hasPrevPage) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/?page=<%= prevPage %>" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                <% } else { %>
+                  <li class="page-item disabled">
+                    <span class="page-link" aria-hidden="true">&laquo;</span>
+                  </li>
+                <% } %>
 
-    <h1><%=post.title%></h1>
-    <p>
-    <% if (post.content.length <= 100) { %>
-      <%=post.content + "  "%>
-    <% } else {%>
-    <%=post.content.substring(0, 100) + " ..."%>
-    <% } %>
-    <a href="/posts/<%=post._id%>">Read More</a>
-    </p>
-    <% }) %>
+                <% 
+                  let startPage = Math.max(1, currentPage - 2);
+                  let endPage = Math.min(totalPages, startPage + 4);
+                  if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                  }
+                %>
 
+                <% if (startPage > 1) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/?page=1">1</a>
+                  </li>
+                  <% if (startPage > 2) { %>
+                    <li class="page-item disabled">
+                      <span class="page-link">...</span>
+                    </li>
+                  <% } %>
+                <% } %>
 
-<%- include("partials/footer"); -%>
+                <% for(let i = startPage; i <= endPage; i++) { %>
+                  <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                    <a class="page-link" href="/?page=<%= i %>"><%= i %></a>
+                  </li>
+                <% } %>
+
+                <% if (endPage < totalPages) { %>
+                  <% if (endPage < totalPages - 1) { %>
+                    <li class="page-item disabled">
+                      <span class="page-link">...</span>
+                    </li>
+                  <% } %>
+                  <li class="page-item">
+                    <a class="page-link" href="/?page=<%= totalPages %>"><%= totalPages %></a>
+                  </li>
+                <% } %>
+
+                <% if (hasNextPage) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/?page=<%= nextPage %>" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                <% } else { %>
+                  <li class="page-item disabled">
+                    <span class="page-link" aria-hidden="true">&raquo;</span>
+                  </li>
+                <% } %>
+              </ul>
+            </nav>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

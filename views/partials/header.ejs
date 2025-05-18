@@ -1,25 +1,51 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog Website</title>
   <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/css/styles.css">
-  <nav class="navbar navbar-default">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <div class="navbar-header">
-        <p class="navbar-brand"><a href="/" class="title">BLOG WEBSITE</a></p>
-      </div>
-        <ul class="nav navbar-nav navbar-right">
-          <li id="home"><a href="/">HOME</a></li>
-          <li id="about"><a href="/about">ABOUT US</a></li>
-          <li id="contact"><a href="/contact">CONTACT US</a></li>
+      <a class="navbar-brand" href="/">Blog Website</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <% if (locals.user) { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/new">Create Post</a>
+            </li>
+          <% } %>
         </ul>
+        <ul class="navbar-nav">
+          <% if (locals.user) { %>
+            <li class="nav-item">
+              <span class="nav-link">Welcome, <%= user.username %></span>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/auth/logout">Logout</a>
+            </li>
+          <% } else { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/auth/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/auth/signup">Sign Up</a>
+            </li>
+          <% } %>
+        </ul>
+      </div>
     </div>
   </nav>
 
-  <body>
-    <div class="container">
+  <div class="container">
